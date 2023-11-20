@@ -28,6 +28,7 @@ import cn.henryhe.io.InputStreamCallback;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
@@ -47,6 +48,23 @@ public class ClassPathUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 文件读取为字符串
+     * @param filePath
+     * @return
+     */
+    public static String readStringByName(String filePath) {
+        // 不含有路径符号
+        if (!filePath.contains("/") && !filePath.contains("\\")) {
+            filePath = getContextClassLoader().getResource(filePath).getPath();
+        }
+        String finalPath = filePath;
+        return readInputStream(filePath, (input) -> {
+            byte [] data = Files.readAllBytes(Paths.get(finalPath));
+            return new String(data, StandardCharsets.UTF_8);
+        });
     }
 
     /**
