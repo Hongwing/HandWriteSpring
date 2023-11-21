@@ -29,6 +29,10 @@ import com.sun.org.slf4j.internal.Logger;
 import com.sun.org.slf4j.internal.LoggerFactory;
 import jakarta.annotation.Nullable;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Function;
 
@@ -44,6 +48,19 @@ public class PropertyResolver {
     static {
         // 初始化转换器
         converters.put(Integer.class, (t) -> Integer.parseInt(t));
+        // String类型:
+        converters.put(String.class, s -> s);
+        // boolean类型:
+        converters.put(boolean.class, s -> Boolean.parseBoolean(s));
+        converters.put(Boolean.class, s -> Boolean.valueOf(s));
+        // int类型:
+        converters.put(int.class, s -> Integer.parseInt(s));
+        // 其他基本类型...
+        // Date/Time类型:
+        converters.put(LocalDate.class, s -> LocalDate.parse(s));
+        converters.put(LocalTime.class, s -> LocalTime.parse(s));
+        converters.put(LocalDateTime.class, s -> LocalDateTime.parse(s));
+        converters.put(ZonedDateTime.class, s -> ZonedDateTime.parse(s));
     }
 
     Map<String, String> properties = new HashMap<>();
