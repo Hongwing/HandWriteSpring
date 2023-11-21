@@ -29,10 +29,7 @@ import com.sun.org.slf4j.internal.Logger;
 import com.sun.org.slf4j.internal.LoggerFactory;
 import jakarta.annotation.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -42,8 +39,14 @@ public class PropertyResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyResolver.class);
 
+    private static Map<Class<?>, Function<String, Object>> converters = new HashMap<>();
+
+    static {
+        // 初始化转换器
+        converters.put(Integer.class, (t) -> Integer.parseInt(t));
+    }
+
     Map<String, String> properties = new HashMap<>();
-    Map<Class<?>, Function<String, Object>> converters = new HashMap<>();
 
     public PropertyResolver(Properties props) {
         // load env key-value
@@ -84,6 +87,35 @@ public class PropertyResolver {
             return parseValue(value);
         }
         return value;
+    }
+
+    /**
+     * 提供类型转换：除string类型外，其他类型也可被获取
+     * @param key
+     * @param targetType
+     * @return
+     * @param <T>
+     */
+    public <T> T getProperty(String key, Class<T> targetType) {
+        String value = getProperty(key);
+        if (value == null) return null;
+
+        return convert(targetType, value);
+    }
+
+    /**
+     * 通过默认转换器提供转换
+     * @param clazz
+     * @param value
+     * @return
+     * @param <T>
+     */
+    private <T> T convert(Class<T> clazz, String value) {
+        Function<String, Object> converter = converters.get(clazz);
+        if (converter == null) {
+            throw new IllformedLocaleException("Unsupported value type" + clazz.getName());
+        }
+        return (T) converter.apply(value);
     }
 
     private String parseValue(String value) {

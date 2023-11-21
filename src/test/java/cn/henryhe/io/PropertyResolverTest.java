@@ -30,6 +30,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Optional;
 import java.util.Properties;
 
 public class PropertyResolverTest {
@@ -59,5 +60,13 @@ public class PropertyResolverTest {
     public void testGetPropertiesToString() throws Exception {
         String properties  = ClassPathUtils.readString("config.properties");
         Assert.assertTrue(properties.contains("name=henryhe"));
+    }
+
+    @Test
+    public void testGetPropertyInteger() throws Exception {
+        Properties properties  = ClassPathUtils.readPropertiesByName("config.properties");
+        propertyResolver = new PropertyResolver(properties);
+        Assert.assertTrue(Integer.class.isInstance(propertyResolver.getProperty("timeout", Integer.class)));
+        Assert.assertEquals(Optional.of(1722222222).get(), propertyResolver.getProperty("timeout", Integer.class));
     }
 }
