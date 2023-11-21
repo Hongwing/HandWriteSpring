@@ -29,6 +29,7 @@ import com.sun.org.slf4j.internal.Logger;
 import com.sun.org.slf4j.internal.LoggerFactory;
 import jakarta.annotation.Nullable;
 
+import java.lang.annotation.Target;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -65,6 +66,17 @@ public class PropertyResolver {
 
     Map<String, String> properties = new HashMap<>();
 
+    /**
+     * 提供注册转换器
+     * @param clazz
+     * @param function
+     */
+    public static void registerConverter(Class<?> clazz, Function<String, Object> function) {
+        if (clazz != null && function != null) {
+            converters.put(clazz, function);
+        }
+    }
+
     public PropertyResolver(Properties props) {
         // load env key-value
         this.properties.putAll(System.getenv());
@@ -95,7 +107,11 @@ public class PropertyResolver {
         PropertyExpr propertyExpr = parsePropertyExpr(name);
         // 带有$
         if (propertyExpr != null) {
-
+            if (propertyExpr.getDefaultValue() != null) {
+                return getproperty(propertyExpr.getKey(), propertyExpr.getDefaultValue());
+            } else {
+                return getRequiredProperty(propertyExpr.getKey());
+            }
         }
         // 不带$
         String value = this.properties.get(name);
@@ -104,6 +120,21 @@ public class PropertyResolver {
             return parseValue(value);
         }
         return value;
+    }
+
+    private String getRequiredProperty(String key) {
+        String value = getProperty(key);
+        return Objects.requireNonNull(value, "Property '" + key + "' not found");
+    }
+
+    private <T> T getRequiredProperty(String key, Class<T> targetType) {
+        T value = getProperty(key, targetType);
+        return Objects.requireNonNull(value, "Property '" + key + "' not found");
+    }
+
+    private String getproperty(String key, String defaultValue) {
+        String value = getProperty(key);
+        return value == null ? parseValue(defaultValue) : value;
     }
 
     /**

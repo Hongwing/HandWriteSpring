@@ -55,23 +55,6 @@ public class ClassPathUtils {
      * @param filePath
      * @return
      */
-    public static String readStringByName(String filePath) {
-        // 不含有路径符号
-        if (!filePath.contains("/") && !filePath.contains("\\")) {
-            filePath = getContextClassLoader().getResource(filePath).getPath();
-        }
-        String finalPath = filePath;
-        return readInputStream(filePath, (input) -> {
-            byte [] data = Files.readAllBytes(Paths.get(finalPath));
-            return new String(data, StandardCharsets.UTF_8);
-        });
-    }
-
-    /**
-     * 文件读取为字符串
-     * @param filePath
-     * @return
-     */
     public static String readString(String filePath) {
         return readInputStream(filePath, (input) -> {
             byte [] data = readAllBytes(input);

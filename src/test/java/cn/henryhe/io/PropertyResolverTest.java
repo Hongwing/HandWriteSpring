@@ -25,13 +25,14 @@
 package cn.henryhe.io;
 
 import cn.henryhe.utils.ClassPathUtils;
+import cn.henryhe.utils.YamlUtils;
 import mockit.Tested;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Optional;
-import java.util.Properties;
+import java.io.Reader;
+import java.util.*;
 
 public class PropertyResolverTest {
     @Tested
@@ -54,6 +55,7 @@ public class PropertyResolverTest {
         Properties properties  = ClassPathUtils.readPropertiesByName("config.properties");
         propertyResolver = new PropertyResolver(properties);
         Assert.assertEquals("henryhe", propertyResolver.getProperty("name"));
+        Assert.assertEquals("1.0.0", propertyResolver.getProperty("${app.version}"));
     }
 
     @Test
@@ -68,5 +70,15 @@ public class PropertyResolverTest {
         propertyResolver = new PropertyResolver(properties);
         Assert.assertTrue(Integer.class.isInstance(propertyResolver.getProperty("timeout", Integer.class)));
         Assert.assertEquals(Optional.of(1722222222).get(), propertyResolver.getProperty("timeout", Integer.class));
+    }
+
+    @Test
+    public void testGetPropertyFromYaml() throws Exception {
+        Map<String, Object> dataMap = YamlUtils.loadYamlAsPlainMap("application.yaml");
+        Properties properties = new Properties();
+        properties.putAll(dataMap);
+        propertyResolver = new PropertyResolver(properties);
+        Assert.assertEquals("1.0.0", propertyResolver.getProperty("${app.version}"));
+        Assert.assertTrue(propertyResolver.getProperty("app.position").contains("home"));
     }
 }
