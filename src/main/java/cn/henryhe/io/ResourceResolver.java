@@ -1,7 +1,6 @@
 package cn.henryhe.io;
 
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,7 +19,7 @@ import java.util.function.Function;
  */
 public class ResourceResolver {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceResolver.class);
+    private static final Logger LOGGER = Logger.getLogger(ResourceResolver.class);
 
     private String basePackage;
 

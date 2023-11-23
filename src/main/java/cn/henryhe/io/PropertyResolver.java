@@ -24,12 +24,9 @@
 
 package cn.henryhe.io;
 
-import com.mysql.cj.util.StringUtils;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
 import jakarta.annotation.Nullable;
+import org.apache.log4j.Logger;
 
-import java.lang.annotation.Target;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -42,7 +39,7 @@ import java.util.function.Function;
  */
 public class PropertyResolver {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PropertyResolver.class);
+    private static final Logger LOGGER = Logger.getLogger(PropertyResolver.class);
 
     private static Map<Class<?>, Function<String, Object>> converters = new HashMap<>();
 
@@ -103,7 +100,7 @@ public class PropertyResolver {
      */
     @Nullable
     public String getProperty(String name) {
-        if (StringUtils.isNullOrEmpty(name)) return null;
+        if (name == null) return null;
         PropertyExpr propertyExpr = parsePropertyExpr(name);
         // 带有$
         if (propertyExpr != null) {
